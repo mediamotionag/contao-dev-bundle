@@ -10,7 +10,7 @@
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_settings']['memo_dev_legend']		= 'Media Motion AG - Entwickler Einstellungen';
+$GLOBALS['TL_LANG']['tl_settings']['memo_dev_legend']		= 'Entwickler Einstellungen';
 
 /**
  * Fields

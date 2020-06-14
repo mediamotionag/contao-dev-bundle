@@ -19,7 +19,7 @@
   },
   "require": {
     "php": ">=7.1.0",
-    "contao/core-bundle": "^4.9"
+    "contao/core-bundle": "^4.4"
   },
   "require-dev": {
     "contao/manager-plugin": "^2.0"
@@ -40,8 +40,7 @@
     "exclude-from-classmap": [
       "src/Resources/contao/config/",
       "src/Resources/contao/dca/",
-      "src/Resources/contao/languages/",
-      "src/Resources/contao/templates/"
+      "src/Resources/contao/languages/"
     ]
   }
 }
