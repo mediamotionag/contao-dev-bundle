@@ -15,10 +15,6 @@ use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Memo\DevBundle\MemoDevBundle;
 
-use Symfony\Component\Config\Loader\LoaderResolverInterface;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Contao\ManagerPlugin\Config\ContainerBuilder as PluginContainerBuilder;
-
 class Plugin implements BundlePluginInterface
 {
     /**
@@ -29,18 +25,5 @@ class Plugin implements BundlePluginInterface
         return [
             BundleConfig::create(MemoDevBundle::class)->setLoadAfter([ContaoCoreBundle::class])
         ];
-    }
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function load(array $mergedConfig, ContainerBuilder $container)
-    {
-        $loader = new YamlFileLoader(
-            $container,
-            new FileLocator(__DIR__.'/../Resources/config')
-        );
-
-        $loader->load('services.yml');
     }
 }

@@ -6,3 +6,10 @@
  * @license    LGPL-3.0+
  * @see	       https://github.com/mediamotionag/contao-dev-bundle
  */
+
+/**
+ * HOOKS
+ */
+
+//Generelle Hooks
+$GLOBALS['TL_HOOKS']['generatePage'][] = array('Memo\DevBundle\Service\HookListener', 'setDevSettings');
