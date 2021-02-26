@@ -13,39 +13,38 @@ use Contao\Controller;
 use Psr\Log\LogLevel;
 use Contao\CoreBundle\Monolog\ContaoContext;
 
-		
+
 class HookListener
 {
-	
+
 	public function setDevSettings( $objPage, $objLayout, $objPageRegular )
 	{
 		$bolDevDomain = false;
-		
+
 		if($strDevDomains = \Contao\Config::get('dev_domains'))
 		{
-			
+
 			$arrDevDomains = explode(',', $strDevDomains);
-			
+
 			if(is_array($arrDevDomains) && count($arrDevDomains) > 0)
 			{
 				$strCurrentDomain = $_SERVER['HTTP_HOST'];
-				
+
 				foreach($arrDevDomains as $strDevDomain)
 				{
 					$strDevDomain = str_replace(' ', '', $strDevDomain);
 					$strDevDomain = str_replace('*', '', $strDevDomain);
 					$strDevDomain = urlencode($strDevDomain);
-					
-					
-					if(stristr($strCurrentDomain, $strDevDomain))
+
+					if($strDevDomain != '' && stristr($strCurrentDomain, $strDevDomain))
 					{
 						$bolDevDomain = true;
 					}
 				}
 			}
-			
+
 		}
-		
+
 		if($bolDevDomain)
 		{
 			// Disable any Indexing development domains
@@ -60,5 +59,5 @@ class HookListener
 			header("Pragma: no-cache");
 		}
 	}
-	
+
 }
