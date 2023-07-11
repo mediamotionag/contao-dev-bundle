@@ -2,7 +2,7 @@
   "name": "mediamotionag/contao-dev-bundle",
   "homepage": "https://github.com/mediamotionag/contao-dev-bundle",
   "description":"Development Settings Bundle",
-  "keywords":["contao", "contao4", "contao-bundle", "dev", "noindex", "nofollow", "nocache"],
+  "keywords":["contao", "contao5", "contao-bundle", "dev", "noindex", "nofollow", "nocache"],
   "type": "contao-bundle",
   "license": "LGPL-3.0+",
   "authors": [
@@ -18,10 +18,12 @@
     "source":"https://github.com/mediamotionag/contao-dev-bundle"
   },
   "require": {
-    "php": ">=7.1.0",
-    "contao/core-bundle": "^4.4"
+    "php": "^8.0",
+    "contao/core-bundle": "^4.13 || ^5.0"
   },
   "require-dev": {
+    "roave/security-advisories": "dev-latest"
+    ,
     "contao/manager-plugin": "^2.0"
   },
   "conflict": {
