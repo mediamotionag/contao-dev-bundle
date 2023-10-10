@@ -1,6 +1,6 @@
 services:
-  _defaults:
-    autowire: true
-    autoconfigure: true
-
-  Memo\DevBundle\EventListener\GeneratePageListener: ~
+    _defaults:
+        autowire: true
+        autoconfigure: true
+    Memo\DevBundle\EventListener\GeneratePageListener: ~
+    Memo\DevBundle\EventSubscriber\KernelRequestSubscriber: ~

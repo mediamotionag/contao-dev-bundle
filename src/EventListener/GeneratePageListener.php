@@ -14,6 +14,8 @@ use Contao\CoreBundle\Routing\ResponseContext\HtmlHeadBag\HtmlHeadBag;
 use Contao\PageRegular;
 use Contao\LayoutModel;
 use Contao\PageModel;
+use Contao\System;
+use Memo\DevBundle\DependencyInjection\MemoDevExtension;
 
 class GeneratePageListener
 {
@@ -23,40 +25,25 @@ class GeneratePageListener
         $bolDevDomain = false;
         global $objPage;
 
-        if($strDevDomains = \Contao\Config::get('dev_domains'))
+        $bolStageDomain = MemoDevExtension::checkDomain('dev_domains');
+        $bolLocalDomain = MemoDevExtension::checkDomain('local_domains');
+
+        // Disable index (only for stage domains)
+        if($bolStageDomain === true)
         {
-            $arrDevDomains = explode(',', $strDevDomains);
-
-            if(is_array($arrDevDomains) && count($arrDevDomains) > 0)
-            {
-                $strCurrentDomain = $_SERVER['HTTP_HOST'];
-
-                foreach($arrDevDomains as $strDevDomain)
-                {
-                    $strDevDomain = str_replace(array(' ', '*'), '', $strDevDomain);
-                    $strDevDomain = urlencode($strDevDomain);
-
-                    if($strDevDomain != '' && stristr($strCurrentDomain, $strDevDomain))
-                    {
-                        $bolDevDomain = true;
-                    }
-                }
-            }
-
-        }
-
-        if($bolDevDomain === true)
-        {
-            $responseContext = \Contao\System::getContainer()->get('contao.routing.response_context_accessor')->getResponseContext();
+            $responseContext = System::getContainer()->get('contao.routing.response_context_accessor')->getResponseContext();
             $htmlHeadBag = $responseContext->get(HtmlHeadBag::class);
             if ($responseContext && $responseContext->has(HtmlHeadBag::class)) {
                 $htmlHeadBag->setMetaRobots('noindex,nofollow');
             }
 
-            // Disable any Indexing development domains
             header("X-Robots-Tag: noindex, nofollow", true);
+        }
 
-            // Disable Caching for development domains
+        // Disable caching (for stage and local domains)
+        if($bolStageDomain === true || $bolLocalDomain === true)
+        {
+            $GLOBALS['TL_CONFIG']['cacheMode'] = 'none';
             header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
             header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
             header("Cache-Control: post-check=0, pre-check=0", false);
