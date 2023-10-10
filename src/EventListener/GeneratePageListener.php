@@ -15,18 +15,17 @@ use Contao\PageRegular;
 use Contao\LayoutModel;
 use Contao\PageModel;
 use Contao\System;
-use Memo\DevBundle\DependencyInjection\MemoDevExtension;
+use Memo\DevBundle\Service\DomainMatcher;
 
 class GeneratePageListener
 {
     #[AsHook('generatePage', priority: 100)]
     public function onGeneratePage(PageModel $objCurrentPage, LayoutModel $objLayout, PageRegular $objPageRegular): void
     {
-        $bolDevDomain = false;
-        global $objPage;
 
-        $bolStageDomain = MemoDevExtension::checkDomain('dev_domains');
-        $bolLocalDomain = MemoDevExtension::checkDomain('local_domains');
+        // Check the current domain against the dev_domains and local_domains
+        $bolStageDomain = DomainMatcher::checkDomain('dev_domains');
+        $bolLocalDomain = DomainMatcher::checkDomain('local_domains');
 
         // Disable index (only for stage domains)
         if($bolStageDomain === true)

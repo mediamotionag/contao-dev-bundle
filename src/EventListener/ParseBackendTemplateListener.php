@@ -11,7 +11,7 @@ namespace Memo\DevBundle\EventListener;
 
 use Contao\Config;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
-use Contao\System;
+use Memo\DevBundle\Service\DomainMatcher;
 
 #[AsHook('parseBackendTemplate')]
 class ParseBackendTemplateListener
@@ -31,7 +31,7 @@ class ParseBackendTemplateListener
             $strClass = "badge-title--live";
 
             // Detect Local and set Badge
-            $bolLocalDomain = self::checkDomain('local_domains');
+            $bolLocalDomain = DomainMatcher::checkDomain('local_domains');
             if($bolLocalDomain === true)
             {
                 $strBadge = "Local";
@@ -39,7 +39,7 @@ class ParseBackendTemplateListener
             }
 
             // Detect Stage and set Badge
-            $bolStageDomain = self::checkDomain('dev_domains');
+            $bolStageDomain = DomainMatcher::checkDomain('dev_domains');
             if($bolStageDomain === true)
             {
                 $strBadge = "Stage";
@@ -60,43 +60,5 @@ class ParseBackendTemplateListener
         }
 
         return $buffer;
-    }
-
-    public static function checkDomain($strTyp='dev_domains')
-    {
-        // Check if the typ is valid
-        if($strTyp != 'dev_domains' && $strTyp != 'local_domains')
-        {
-            return false;
-        }
-
-        // Get Config value
-        $strDomains = Config::get($strTyp);
-
-        // Get the matching domains and compare
-
-        if($strDomains != '')
-        {
-
-            $arrDomains = explode(',', $strDomains);
-
-            if(is_array($arrDomains) && count($arrDomains) > 0)
-            {
-                $strCurrentDomain = $_SERVER['HTTP_HOST'];
-
-                foreach($arrDomains as $strDomain)
-                {
-                    $strDomain = str_replace(array(' ', '*'), '', $strDomain);
-                    $strDomain = urlencode($strDomain);
-
-                    if($strDomain != '' && stristr($strCurrentDomain, $strDomain))
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
     }
 }
