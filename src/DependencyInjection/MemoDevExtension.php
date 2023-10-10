@@ -52,48 +52,7 @@ class MemoDevExtension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
         $loader->load('services.yaml');
 
-        $this->setBadge($container);
+        $container->setParameter('contao.backend.badge_title', 'Live');
     }
 
-    private function setBadge($container)
-    {
-        // Load Contao Config
-        $strConfigPath = '../system/config/localconfig.php';
-        if(file_exists($strConfigPath)){
-            include $strConfigPath;
-        } else {
-            return false;
-        }
-
-        // Default Badge
-        $strBadge = "Live";
-
-        // Detect Stage and set Badge
-        $bolStageDomain = self::checkDomain('dev_domains', $GLOBALS['TL_CONFIG']);
-        if($bolStageDomain === true)
-        {
-            $strBadge = "Stage";
-        }
-
-        // Detect Local and set Badge
-        $bolLocalDomain = self::checkDomain('local_domains', $GLOBALS['TL_CONFIG']);
-        if($bolLocalDomain === true)
-        {
-            $strBadge = "Local";
-        }
-
-        // Detect Content Freeze and set Badge
-        if(array_key_exists('content_freeze', $GLOBALS['TL_CONFIG']) && $GLOBALS['TL_CONFIG']['content_freeze'] == true){
-            $strBadge .= " + Content Freeze";
-        }
-
-        // Set Badge
-        $container->setParameter('contao.backend.badge_title', $strBadge);
-
-        // If backend title is set, use it
-        if(array_key_exists('backend_title', $GLOBALS['TL_CONFIG']) && $GLOBALS['TL_CONFIG']['backend_title'] != ''){
-            $container->setParameter('contao.backend.attributes', array('backend-title' => $GLOBALS['TL_CONFIG']['backend_title']));
-        }
-
-    }
 }

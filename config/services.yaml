@@ -3,4 +3,9 @@ services:
         autowire: true
         autoconfigure: true
     Memo\DevBundle\EventListener\GeneratePageListener: ~
+    Memo\DevBundle\EventListener\ParseBackendTemplateListener: ~
+    Memo\DevBundle\EventListener\DataContainer\SaveDevSettingsCallback:
+        tags:
+            - { name: contao.callback, table: tl_settings, target: config.onsubmit, method: onSubmitCallback, priority: 100 }
+        public: true
     Memo\DevBundle\EventSubscriber\KernelRequestSubscriber: ~
