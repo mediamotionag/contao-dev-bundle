@@ -52,6 +52,7 @@ class MemoDevExtension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
         $loader->load('services.yaml');
 
+        // Set default "Live" so the badge is always present in the template, to be replaced there
         $container->setParameter('contao.backend.badge_title', 'Live');
     }
 
