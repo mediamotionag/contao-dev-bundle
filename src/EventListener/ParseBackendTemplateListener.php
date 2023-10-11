@@ -18,7 +18,7 @@ class ParseBackendTemplateListener
 {
     public function __invoke(string $buffer, string $template): string
     {
-        if ('be_main' === $template) {
+        if (in_array($template, ['be_main', 'be_login'])) {
 
             // Backend Title
             $strBackendTitle = Config::get('backend_title');
