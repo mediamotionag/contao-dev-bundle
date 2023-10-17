@@ -1,0 +1,15 @@
+.badge-title--live {
+    background-color: #5cb85c;
+}
+
+.badge-title--stage {
+    background-color: #2391d2;
+}
+
+.badge-title--local {
+    background-color: #f2be11;
+}
+
+.badge-title--freeze {
+    background-color: #f20606;
+}
