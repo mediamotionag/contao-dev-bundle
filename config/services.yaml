@@ -9,3 +9,6 @@ services:
             - { name: contao.callback, table: tl_settings, target: config.onsubmit, method: onSubmitCallback, priority: 100 }
         public: true
     Memo\DevBundle\EventSubscriber\KernelRequestSubscriber: ~
+    memo.dev.pagebackendtemplatelistener:
+        class: Memo\DevBundle\EventListener\ParseBackendTemplateListener
+        public: true

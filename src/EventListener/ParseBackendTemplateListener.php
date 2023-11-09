@@ -53,7 +53,7 @@ class ParseBackendTemplateListener
                 $strClass .= " badge-title--freeze";
             }
 
-            if($strBackendTitle != ''){
+            if($strClass != ''){
                 $buffer = preg_replace('/badge-title(.*?)<\/span>/', 'badge-title '.$strClass.'">'.$strBadge.'</span>', $buffer);
             }
 
