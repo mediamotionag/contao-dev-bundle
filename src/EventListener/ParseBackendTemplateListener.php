@@ -20,12 +20,6 @@ class ParseBackendTemplateListener
     {
         if (in_array($template, ['be_main', 'be_login'])) {
 
-            // Backend Title
-            $strBackendTitle = Config::get('backend_title');
-            if($strBackendTitle != ''){
-                $buffer = preg_replace('/app-title(.*?)<\/span>/', 'app-title">Contao | '.$strBackendTitle.'</span>', $buffer);
-            }
-
             // Default Badge
             $strBadge = "Live";
             $strClass = "badge-title--live";
