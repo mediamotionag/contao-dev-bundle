@@ -4,6 +4,12 @@ services:
         autoconfigure: true
     Memo\DevBundle\EventListener\GeneratePageListener: ~
     Memo\DevBundle\EventListener\ParseBackendTemplateListener: ~
+    Memo\DevBundle\EventListener\ParseFrontendTemplateListener:
+        arguments:
+            $framework: '@contao.framework'
+        tags:
+            - { name: contao.hook, hook: parseFrontendTemplate }
+        public: true
     Memo\DevBundle\EventListener\DataContainer\SaveDevSettingsCallback:
         tags:
             - { name: contao.callback, table: tl_settings, target: config.onsubmit, method: onSubmitCallback, priority: 100 }

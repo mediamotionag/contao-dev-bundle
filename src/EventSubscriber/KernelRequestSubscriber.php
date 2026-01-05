@@ -6,6 +6,7 @@ use Contao\BackendUser;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
+use Contao\FrontendUser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -37,16 +38,17 @@ class KernelRequestSubscriber implements EventSubscriberInterface
         return [
             // Run after security firewall (priority 8) and router (priority 32) to have access to route and auth
             KernelEvents::REQUEST => [
-                ['onKernelRequestContentFreeze', 5],
+                ['onKernelRequestContentFreezeBackend', 5],
+                ['onKernelRequestContentFreezeFrontend', 5],
                 ['onKernelRequestAssets', -10],
             ],
         ];
     }
 
     /**
-     * Handle content freeze - runs after security and routing
+     * Handle content freeze for backend users
      */
-    public function onKernelRequestContentFreeze(RequestEvent $e): void
+    public function onKernelRequestContentFreezeBackend(RequestEvent $e): void
     {
         $request = $e->getRequest();
 
@@ -90,6 +92,44 @@ class KernelRequestSubscriber implements EventSubscriberInterface
         // Redirect to login page where they'll see the content freeze banner
         $loginUrl = $this->router->generate('contao_backend_login');
         $e->setResponse(new RedirectResponse($loginUrl));
+    }
+
+    /**
+     * Handle content freeze for frontend (member) users
+     */
+    public function onKernelRequestContentFreezeFrontend(RequestEvent $e): void
+    {
+        $request = $e->getRequest();
+
+        if (!$this->scopeMatcher->isFrontendRequest($request)) {
+            return;
+        }
+
+        if (!$this->isContentFreezeActive()) {
+            return;
+        }
+
+        $token = $this->tokenStorage->getToken();
+
+        if ($token === null) {
+            return;
+        }
+
+        $user = $token->getUser();
+
+        // Check if user is a logged-in frontend member
+        if (!$user instanceof FrontendUser) {
+            return;
+        }
+
+        // Clear the security token to log out the user
+        $this->tokenStorage->setToken(null);
+
+        // Invalidate the session to clear all session data
+        $session = $request->getSession();
+        if ($session !== null && $session->isStarted()) {
+            $session->invalidate();
+        }
     }
 
     /**
