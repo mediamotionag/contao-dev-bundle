@@ -40,6 +40,8 @@ class SaveDevSettingsCallback
         $finder = Finder::create()
             ->depth(0)
             ->exclude($containerDir)
+            // Exclude contao directory to preserve language cache
+            ->exclude('contao')
             ->in($cacheDir)
         ;
 
