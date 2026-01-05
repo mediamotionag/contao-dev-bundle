@@ -6,6 +6,7 @@ use Contao\BackendUser;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
+use Contao\FrontendUser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -36,13 +37,17 @@ class KernelRequestSubscriber implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
-                ['onKernelRequestContentFreeze', 5],
+                ['onKernelRequestContentFreezeBackend', 5],
+                ['onKernelRequestContentFreezeFrontend', 5],
                 ['onKernelRequestAssets', -10],
             ],
         ];
     }
 
-    public function onKernelRequestContentFreeze(RequestEvent $e): void
+    /**
+     * Handle content freeze for backend users
+     */
+    public function onKernelRequestContentFreezeBackend(RequestEvent $e): void
     {
         $request = $e->getRequest();
 
@@ -61,19 +66,19 @@ class KernelRequestSubscriber implements EventSubscriberInterface
         }
 
         $token = $this->tokenStorage->getToken();
-        $isAuthenticated = $token !== null 
-            && $token->getUser() !== null 
+        $isAuthenticated = $token !== null
+            && $token->getUser() !== null
             && is_object($token->getUser())
             && method_exists($token->getUser(), 'getUsername')
             && $token->getUser()->getUsername() !== '';
 
         if ($isAuthenticated) {
             $user = $token->getUser();
-            
+
             if ($user instanceof BackendUser && $user->isAdmin) {
                 return;
             }
-            
+
             $logoutUrl = $this->router->generate('contao_backend_logout');
             $e->setResponse(new RedirectResponse($logoutUrl));
             return;
@@ -81,6 +86,44 @@ class KernelRequestSubscriber implements EventSubscriberInterface
 
         $loginUrl = $this->router->generate('contao_backend_login');
         $e->setResponse(new RedirectResponse($loginUrl));
+    }
+
+    /**
+     * Handle content freeze for frontend (member) users
+     */
+    public function onKernelRequestContentFreezeFrontend(RequestEvent $e): void
+    {
+        $request = $e->getRequest();
+
+        if (!$this->scopeMatcher->isFrontendRequest($request)) {
+            return;
+        }
+
+        if (!$this->isContentFreezeActive()) {
+            return;
+        }
+
+        $token = $this->tokenStorage->getToken();
+
+        if ($token === null) {
+            return;
+        }
+
+        $user = $token->getUser();
+
+        // Check if user is a logged-in frontend member
+        if (!$user instanceof FrontendUser) {
+            return;
+        }
+
+        // Clear the security token to log out the user
+        $this->tokenStorage->setToken(null);
+
+        // Invalidate the session to clear all session data
+        $session = $request->getSession();
+        if ($session !== null && $session->isStarted()) {
+            $session->invalidate();
+        }
     }
 
     public function onKernelRequestAssets(RequestEvent $e): void
@@ -99,7 +142,7 @@ class KernelRequestSubscriber implements EventSubscriberInterface
         $assetsDir = '/bundles/memodev';
         $jsFile = $strRoot . $assetsDir . '/backend.js';
         $cssFile = $strRoot . $assetsDir . '/backend.css';
-        
+
         if (file_exists($jsFile) && file_exists($cssFile)) {
             $jsTimestamp = filemtime($jsFile);
             $cssTimestamp = filemtime($cssFile);
