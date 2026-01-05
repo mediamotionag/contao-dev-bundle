@@ -67,19 +67,19 @@ class KernelRequestSubscriber implements EventSubscriberInterface
 
         // Check if user is authenticated
         $token = $this->tokenStorage->getToken();
-        $isAuthenticated = $token !== null 
-            && $token->getUser() !== null 
+        $isAuthenticated = $token !== null
+            && $token->getUser() !== null
             && is_object($token->getUser())
             && $token->getUser()->getUserIdentifier() !== '';
 
         if ($isAuthenticated) {
             $user = $token->getUser();
-            
+
             // Allow admin users to bypass the content freeze
             if ($user instanceof BackendUser && $user->isAdmin) {
                 return;
             }
-            
+
             // Non-admin user is logged in - log them out by redirecting to logout
             $logoutUrl = $this->router->generate('contao_backend_logout');
             $e->setResponse(new RedirectResponse($logoutUrl));
@@ -113,7 +113,7 @@ class KernelRequestSubscriber implements EventSubscriberInterface
         $assetsDir = '/bundles/memodev';
         $jsFile = $strRoot . $assetsDir . '/backend.js';
         $cssFile = $strRoot . $assetsDir . '/backend.css';
-        
+
         if (file_exists($jsFile) && file_exists($cssFile)) {
             $jsTimestamp = filemtime($jsFile);
             $cssTimestamp = filemtime($cssFile);
