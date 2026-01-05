@@ -8,7 +8,12 @@ services:
         tags:
             - { name: contao.callback, table: tl_settings, target: config.onsubmit, method: onSubmitCallback, priority: 100 }
         public: true
-    Memo\DevBundle\EventSubscriber\KernelRequestSubscriber: ~
+    Memo\DevBundle\EventSubscriber\KernelRequestSubscriber:
+        arguments:
+            $scopeMatcher: '@contao.routing.scope_matcher'
+            $tokenStorage: '@security.token_storage'
+            $router: '@router'
+            $framework: '@contao.framework'
     memo.dev.pagebackendtemplatelistener:
         class: Memo\DevBundle\EventListener\ParseBackendTemplateListener
         public: true
