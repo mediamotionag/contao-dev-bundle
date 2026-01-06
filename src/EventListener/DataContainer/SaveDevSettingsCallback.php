@@ -26,7 +26,7 @@ class SaveDevSettingsCallback
         $this->requestStack = $requestStack;
     }
 
-    public function onSubmitCallback(DataContainer $dc = null): void
+    public function onSubmitCallback(?DataContainer $dc = null): void
     {
         // Clear cache
         $filesystem = new Filesystem();
