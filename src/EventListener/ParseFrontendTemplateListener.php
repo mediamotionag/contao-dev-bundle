@@ -34,7 +34,6 @@ class ParseFrontendTemplateListener
         }
 
         // Check if content freeze is active
-        var_dump($this->isContentFreezeActive());
         if (!$this->isContentFreezeActive()) {
             return $strBuffer;
         }
