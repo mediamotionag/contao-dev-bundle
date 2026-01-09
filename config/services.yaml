@@ -2,10 +2,7 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
-    Memo\DevBundle\EventListener\GeneratePageListener:
-        arguments:
-            $scopeMatcher: '@contao.routing.scope_matcher'
-            $responseContextAccessor: '@contao.routing.response_context_accessor'
+    Memo\DevBundle\EventListener\GeneratePageListener: ~
     Memo\DevBundle\EventListener\ParseBackendTemplateListener: ~
     Memo\DevBundle\EventListener\ParseFrontendTemplateListener:
         arguments:

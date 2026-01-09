@@ -47,7 +47,7 @@ class GeneratePageListener
         $response = $event->getResponse();
 
         // Disable index (only for stage domains)
-        if ($isStageDomain === true) {
+        if ($isStageDomain) {
             // Set meta robots via response context if available
             $responseContext = $this->responseContextAccessor->getResponseContext();
             if ($responseContext && $responseContext->has(HtmlHeadBag::class)) {
@@ -59,7 +59,9 @@ class GeneratePageListener
         }
 
         // Disable caching (for stage and local domains)
-        if ($isStageDomain === true || $isLocalDomain === true) {
+        if ($isStageDomain || $isLocalDomain) {
+            // Disable Contao's internal caching
+            $GLOBALS['TL_CONFIG']['cacheMode'] = 'none';
             $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
             $response->headers->set('Pragma', 'no-cache');
             $response->setPrivate();
