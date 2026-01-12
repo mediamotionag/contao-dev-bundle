@@ -9,44 +9,62 @@
 
 namespace Memo\DevBundle\EventListener;
 
-use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Routing\ResponseContext\HtmlHeadBag\HtmlHeadBag;
-use Contao\PageRegular;
-use Contao\LayoutModel;
-use Contao\PageModel;
-use Contao\System;
+use Contao\CoreBundle\Routing\ResponseContext\ResponseContextAccessor;
+use Contao\CoreBundle\Routing\ScopeMatcher;
 use Memo\DevBundle\Service\DomainMatcher;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
+#[AsEventListener(event: KernelEvents::RESPONSE, priority: 100)]
 class GeneratePageListener
 {
-    #[AsHook('generatePage', priority: 100)]
-    public function onGeneratePage(PageModel $objCurrentPage, LayoutModel $objLayout, PageRegular $objPageRegular): void
+    public function __construct(
+        private readonly ScopeMatcher $scopeMatcher,
+        private readonly ResponseContextAccessor $responseContextAccessor,
+    ) {
+    }
+
+    public function __invoke(ResponseEvent $event): void
     {
+        $request = $event->getRequest();
+
+        // Only process frontend requests
+        if (!$this->scopeMatcher->isFrontendRequest($request)) {
+            return;
+        }
+
+        // Only process main requests
+        if (!$event->isMainRequest()) {
+            return;
+        }
 
         // Check the current domain against the dev_domains and local_domains
-        $bolStageDomain = DomainMatcher::checkDomain('dev_domains');
-        $bolLocalDomain = DomainMatcher::checkDomain('local_domains');
+        $isStageDomain = DomainMatcher::checkDomain('dev_domains');
+        $isLocalDomain = DomainMatcher::checkDomain('local_domains');
+
+        $response = $event->getResponse();
 
         // Disable index (only for stage domains)
-        if($bolStageDomain === true)
-        {
-            $responseContext = System::getContainer()->get('contao.routing.response_context_accessor')->getResponseContext();
-            $htmlHeadBag = $responseContext->get(HtmlHeadBag::class);
+        if ($isStageDomain) {
+            // Set meta robots via response context if available
+            $responseContext = $this->responseContextAccessor->getResponseContext();
             if ($responseContext && $responseContext->has(HtmlHeadBag::class)) {
+                $htmlHeadBag = $responseContext->get(HtmlHeadBag::class);
                 $htmlHeadBag->setMetaRobots('noindex,nofollow');
             }
 
-            header("X-Robots-Tag: noindex, nofollow", true);
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
         }
 
         // Disable caching (for stage and local domains)
-        if($bolStageDomain === true || $bolLocalDomain === true)
-        {
+        if ($isStageDomain || $isLocalDomain) {
+            // Disable Contao's internal caching
             $GLOBALS['TL_CONFIG']['cacheMode'] = 'none';
-            header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-            header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-            header("Cache-Control: post-check=0, pre-check=0", false);
-            header("Pragma: no-cache");
+            $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->setPrivate();
         }
     }
 }
