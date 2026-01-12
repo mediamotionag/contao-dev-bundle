@@ -2,7 +2,9 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+    Memo\DevBundle\Service\DomainMatcher: ~
     Memo\DevBundle\EventListener\GeneratePageListener: ~
+    Memo\DevBundle\EventListener\RobotsTxtListener: ~
     Memo\DevBundle\EventListener\ParseBackendTemplateListener: ~
     Memo\DevBundle\EventListener\ParseFrontendTemplateListener:
         arguments:
