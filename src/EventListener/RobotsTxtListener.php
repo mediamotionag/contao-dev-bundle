@@ -22,11 +22,18 @@ use webignition\RobotsTxt\Record\Record;
 #[AsEventListener(event: 'contao.robots_txt', priority: -100)]
 class RobotsTxtListener
 {
+    private DomainMatcher $domainMatcher;
+
+    public function __construct(DomainMatcher $domainMatcher)
+    {
+        $this->domainMatcher = $domainMatcher;
+    }
+
     public function __invoke(RobotsTxtEvent $event): void
     {
         // Only block crawling on staging and local domains
-        $isStageDomain = DomainMatcher::checkDomain('dev_domains');
-        $isLocalDomain = DomainMatcher::checkDomain('local_domains');
+        $isStageDomain = $this->domainMatcher->checkDomain('dev_domains');
+        $isLocalDomain = $this->domainMatcher->checkDomain('local_domains');
 
         if (!$isStageDomain && !$isLocalDomain) {
             return;
