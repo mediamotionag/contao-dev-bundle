@@ -3,6 +3,7 @@ services:
         autowire: true
         autoconfigure: true
     Memo\DevBundle\EventListener\GeneratePageListener: ~
+    Memo\DevBundle\EventListener\RobotsTxtListener: ~
     Memo\DevBundle\EventListener\ParseBackendTemplateListener: ~
     Memo\DevBundle\EventListener\ParseFrontendTemplateListener:
         arguments:

@@ -46,7 +46,6 @@ class GeneratePageListener
 
         $response = $event->getResponse();
 
-        // Disable index (only for stage domains)
         if ($isStageDomain) {
             // Set meta robots via response context if available
             $responseContext = $this->responseContextAccessor->getResponseContext();
@@ -56,9 +55,19 @@ class GeneratePageListener
             }
 
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+
+            // Also modify the HTML response directly to ensure noindex is set
+            $content = $response->getContent();
+            if ($content && str_contains($content, '<meta name="robots"')) {
+                $content = preg_replace(
+                    '/<meta\s+name=["\']robots["\']\s+content=["\'][^"\']*["\']\s*\/?>/i',
+                    '<meta name="robots" content="noindex,nofollow">',
+                    $content
+                );
+                $response->setContent($content);
+            }
         }
 
-        // Disable caching (for stage and local domains)
         if ($isStageDomain || $isLocalDomain) {
             // Disable Contao's internal caching
             $GLOBALS['TL_CONFIG']['cacheMode'] = 'none';
