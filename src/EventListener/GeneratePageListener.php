@@ -59,12 +59,14 @@ class GeneratePageListener
             // Also modify the HTML response directly to ensure noindex is set
             $content = $response->getContent();
             if ($content && str_contains($content, '<meta name="robots"')) {
-                $content = preg_replace(
+                $replacedContent = preg_replace(
                     '/<meta\s+name=["\']robots["\']\s+content=["\'][^"\']*["\']\s*\/?>/i',
                     '<meta name="robots" content="noindex,nofollow">',
                     $content
                 );
-                $response->setContent($content);
+                if ($replacedContent !== null) {
+                    $response->setContent($replacedContent);
+                }
             }
         }
 
