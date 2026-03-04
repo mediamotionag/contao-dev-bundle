@@ -29,7 +29,7 @@ class ParseFrontendTemplateListener
     public function __invoke(string $strBuffer, string $strTemplate): string
     {
         // Only handle login form templates
-        if (!str_contains($strTemplate, 'mod_login')) {
+        if (strpos($strTemplate, 'mod_login') === false) {
             return $strBuffer;
         }
 
@@ -39,15 +39,15 @@ class ParseFrontendTemplateListener
         }
 
         // Don't add banner if already present
-        if (str_contains($strBuffer, 'content-freeze-frontend-banner')) {
+        if (strpos($strBuffer, 'content-freeze-frontend-banner') !== false) {
             return $strBuffer;
         }
 
         // Load translations
         System::loadLanguageFile('default');
 
-        $title = $GLOBALS['TL_LANG']['MSC']['content_freeze_frontend_title'] ?? 'Wartungsarbeiten';
-        $message = $GLOBALS['TL_LANG']['MSC']['content_freeze_frontend_message'] ?? 'Es werden Wartungsarbeiten durchgeführt. Aktuell ist keine Anmeldung möglich.';
+        $title = isset($GLOBALS['TL_LANG']['MSC']['content_freeze_frontend_title']) ? $GLOBALS['TL_LANG']['MSC']['content_freeze_frontend_title'] : 'Wartungsarbeiten';
+        $message = isset($GLOBALS['TL_LANG']['MSC']['content_freeze_frontend_message']) ? $GLOBALS['TL_LANG']['MSC']['content_freeze_frontend_message'] : 'Es werden Wartungsarbeiten durchgeführt. Aktuell ist keine Anmeldung möglich.';
 
         $banner = <<<HTML
             <div id="content-freeze-frontend-banner" style="background-color: #f44336; color: white; padding: 15px; margin-bottom: 15px; border-radius: 4px; text-align: center;">
@@ -57,7 +57,7 @@ class ParseFrontendTemplateListener
         HTML;
 
         // Insert banner at the beginning of the module
-        if (str_contains($strBuffer, '<form')) {
+        if (strpos($strBuffer, '<form') !== false) {
             $strBuffer = preg_replace('/(<form[^>]*>)/i', $banner . '$1', $strBuffer, 1);
         } else {
             // Fallback: prepend to buffer

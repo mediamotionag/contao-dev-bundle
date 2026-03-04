@@ -11,7 +11,6 @@ namespace Memo\DevBundle\EventListener;
 
 use Contao\CoreBundle\Event\RobotsTxtEvent;
 use Memo\DevBundle\Service\DomainMatcher;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use webignition\RobotsTxt\Directive\Directive;
 use webignition\RobotsTxt\Directive\UserAgentDirective;
 use webignition\RobotsTxt\Record\Record;
@@ -19,7 +18,6 @@ use webignition\RobotsTxt\Record\Record;
 /**
  * Modifies robots.txt to disallow all crawling on staging and local domains.
  */
-#[AsEventListener(event: 'contao.robots_txt', priority: -100)]
 class RobotsTxtListener
 {
     private DomainMatcher $domainMatcher;

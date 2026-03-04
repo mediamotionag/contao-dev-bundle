@@ -5,6 +5,7 @@
     "keywords": [
         "contao",
         "contao5",
+        "contao4",
         "contao-bundle",
         "dev",
         "noindex",
@@ -26,8 +27,8 @@
         "source": "https://github.com/mediamotionag/contao-dev-bundle"
     },
     "require": {
-        "php": "^8.1",
-        "contao/core-bundle": "^5.6"
+        "php": "^7.4 || ^8.1",
+        "contao/core-bundle": "^4.13 || ^5.0"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",

@@ -11,7 +11,7 @@ namespace Memo\DevBundle\EventListener\DataContainer;
 
 use Contao\DataContainer;
 use Contao\Message;
-use Contao\System;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
@@ -19,11 +19,20 @@ use Symfony\Component\Finder\Finder;
 
 class SaveDevSettingsCallback
 {
+    /** @var RequestStack */
     private $requestStack;
 
-    public function __construct(RequestStack $requestStack)
+    /** @var string */
+    private $cacheDir;
+
+    /** @var ContainerInterface */
+    private $container;
+
+    public function __construct(RequestStack $requestStack, $cacheDir, ContainerInterface $container)
     {
         $this->requestStack = $requestStack;
+        $this->cacheDir = $cacheDir;
+        $this->container = $container;
     }
 
     public function onSubmitCallback(?DataContainer $dc = null): void
@@ -31,10 +40,8 @@ class SaveDevSettingsCallback
         // Clear cache
         $filesystem = new Filesystem();
 
-        // Get Container Parameter
-        $container = System::getContainer();
-        $cacheDir = $container->getParameter('kernel.cache_dir');
-        $ref = new \ReflectionObject($container);
+        // Exclude the compiled container directory so the current request can finish
+        $ref = new \ReflectionObject($this->container);
         $containerDir = basename(Path::getDirectory($ref->getFileName()));
 
         $finder = Finder::create()
@@ -42,7 +49,7 @@ class SaveDevSettingsCallback
             ->exclude($containerDir)
             // Exclude contao directory to preserve language cache
             ->exclude('contao')
-            ->in($cacheDir)
+            ->in($this->cacheDir)
         ;
 
         foreach ($finder as $file) {
@@ -51,10 +58,6 @@ class SaveDevSettingsCallback
 
         if (\function_exists('opcache_reset')) {
             opcache_reset();
-        }
-
-        if (\function_exists('apc_clear_cache') && !\ini_get('apc.stat')) {
-            apc_clear_cache();
         }
 
         // Show backend message
