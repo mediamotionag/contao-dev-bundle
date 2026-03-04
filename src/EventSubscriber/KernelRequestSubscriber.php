@@ -33,7 +33,7 @@ class KernelRequestSubscriber implements EventSubscriberInterface
         $this->framework = $framework;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             // Run after security firewall (priority 8) and router (priority 32) to have access to route and auth
@@ -67,18 +67,13 @@ class KernelRequestSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // Check if user is authenticated
+        // Check if user is authenticated as a backend user
         $token = $this->tokenStorage->getToken();
-        $isAuthenticated = $token !== null
-            && $token->getUser() !== null
-            && is_object($token->getUser())
-            && $token->getUser()->getUserIdentifier() !== '';
+        $user = ($token !== null) ? $token->getUser() : null;
 
-        if ($isAuthenticated) {
-            $user = $token->getUser();
-
+        if ($user instanceof BackendUser) {
             // Allow admin users to bypass the content freeze
-            if ($user instanceof BackendUser && $user->isAdmin) {
+            if ($user->isAdmin) {
                 return;
             }
 
