@@ -66,16 +66,11 @@ class KernelRequestSubscriber implements EventSubscriberInterface
         }
 
         $token = $this->tokenStorage->getToken();
-        $isAuthenticated = $token !== null
-            && $token->getUser() !== null
-            && is_object($token->getUser())
-            && method_exists($token->getUser(), 'getUsername')
-            && $token->getUser()->getUsername() !== '';
+        $user = $token?->getUser();
+        $isAuthenticated = $user instanceof BackendUser;
 
         if ($isAuthenticated) {
-            $user = $token->getUser();
-
-            if ($user instanceof BackendUser && $user->isAdmin) {
+            if ($user->isAdmin) {
                 return;
             }
 
