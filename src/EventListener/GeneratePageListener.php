@@ -19,10 +19,15 @@ use Memo\DevBundle\Service\DomainMatcher;
 
 class GeneratePageListener
 {
+    private $responseContextAccessor;
+    private $domainMatcher;
+
     public function __construct(
-        private readonly ResponseContextAccessor $responseContextAccessor,
-        private readonly DomainMatcher $domainMatcher,
+        ResponseContextAccessor $responseContextAccessor,
+        DomainMatcher $domainMatcher
     ) {
+        $this->responseContextAccessor = $responseContextAccessor;
+        $this->domainMatcher = $domainMatcher;
     }
 
     #[AsHook('generatePage', priority: 100)]

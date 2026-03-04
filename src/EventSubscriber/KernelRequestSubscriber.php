@@ -16,12 +16,21 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class KernelRequestSubscriber implements EventSubscriberInterface
 {
+    protected $scopeMatcher;
+    protected $tokenStorage;
+    protected $router;
+    protected $framework;
+
     public function __construct(
-        protected readonly ScopeMatcher $scopeMatcher,
-        protected readonly TokenStorageInterface $tokenStorage,
-        protected readonly RouterInterface $router,
-        protected readonly ContaoFramework $framework,
+        ScopeMatcher $scopeMatcher,
+        TokenStorageInterface $tokenStorage,
+        RouterInterface $router,
+        ContaoFramework $framework
     ) {
+        $this->scopeMatcher = $scopeMatcher;
+        $this->tokenStorage = $tokenStorage;
+        $this->router = $router;
+        $this->framework = $framework;
     }
 
     public static function getSubscribedEvents(): array
@@ -57,7 +66,7 @@ class KernelRequestSubscriber implements EventSubscriberInterface
         }
 
         $token = $this->tokenStorage->getToken();
-        $user = $token?->getUser();
+        $user = $token !== null ? $token->getUser() : null;
         $isAuthenticated = $user instanceof BackendUser;
 
         if ($isAuthenticated) {

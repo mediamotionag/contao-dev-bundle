@@ -17,9 +17,6 @@ use Memo\DevBundle\MemoDevBundle;
 
 class Plugin implements BundlePluginInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getBundles(ParserInterface $parser)
     {
         return [

@@ -16,9 +16,11 @@ use Symfony\Component\Finder\Finder;
 
 class SaveDevSettingsCallback
 {
-    public function __construct(
-        private readonly string $cacheDir,
-    ) {
+    private $cacheDir;
+
+    public function __construct(string $cacheDir)
+    {
+        $this->cacheDir = $cacheDir;
     }
 
     public function onSubmitCallback(?DataContainer $dc = null): void
@@ -33,7 +35,7 @@ class SaveDevSettingsCallback
 
         foreach ($finder as $file) {
             // Skip compiled container directories (e.g. ContainerAbcDef/)
-            if ($file->isDir() && str_starts_with($file->getFilename(), 'Container')) {
+            if ($file->isDir() && strpos($file->getFilename(), 'Container') === 0) {
                 continue;
             }
             $filesystem->remove($file->getPathname());

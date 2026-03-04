@@ -14,9 +14,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class DomainMatcher
 {
-    public function __construct(
-        private readonly RequestStack $requestStack,
-    ) {
+    private $requestStack;
+
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
     }
 
     public function checkDomain(string $strTyp = 'dev_domains'): bool
@@ -60,6 +62,6 @@ class DomainMatcher
             return $request->getHost();
         }
 
-        return $_SERVER['HTTP_HOST'] ?? '';
+        return isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
     }
 }

@@ -15,9 +15,11 @@ use Contao\System;
 
 class ParseFrontendTemplateListener
 {
-    public function __construct(
-        protected readonly ContaoFramework $framework,
-    ) {
+    protected $framework;
+
+    public function __construct(ContaoFramework $framework)
+    {
+        $this->framework = $framework;
     }
 
     /**
@@ -44,8 +46,8 @@ class ParseFrontendTemplateListener
         // Load translations
         System::loadLanguageFile('default');
 
-        $title = $GLOBALS['TL_LANG']['MSC']['content_freeze_frontend_title'] ?? 'Wartungsarbeiten';
-        $message = $GLOBALS['TL_LANG']['MSC']['content_freeze_frontend_message'] ?? 'Es werden Wartungsarbeiten durchgeführt. Aktuell ist keine Anmeldung möglich.';
+        $title = isset($GLOBALS['TL_LANG']['MSC']['content_freeze_frontend_title']) ? $GLOBALS['TL_LANG']['MSC']['content_freeze_frontend_title'] : 'Wartungsarbeiten';
+        $message = isset($GLOBALS['TL_LANG']['MSC']['content_freeze_frontend_message']) ? $GLOBALS['TL_LANG']['MSC']['content_freeze_frontend_message'] : 'Es werden Wartungsarbeiten durchgeführt. Aktuell ist keine Anmeldung möglich.';
 
         $banner = <<<HTML
             <div id="content-freeze-frontend-banner" style="background-color: #f44336; color: white; padding: 15px; margin-bottom: 15px; border-radius: 4px; text-align: center;">

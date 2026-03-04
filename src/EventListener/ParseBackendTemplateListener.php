@@ -17,9 +17,11 @@ use Memo\DevBundle\Service\DomainMatcher;
 #[AsHook('parseBackendTemplate')]
 class ParseBackendTemplateListener
 {
-    public function __construct(
-        private readonly DomainMatcher $domainMatcher,
-    ) {
+    private $domainMatcher;
+
+    public function __construct(DomainMatcher $domainMatcher)
+    {
+        $this->domainMatcher = $domainMatcher;
     }
 
     public function __invoke(string $buffer, string $template): string
@@ -82,8 +84,8 @@ class ParseBackendTemplateListener
 
         // Load language file and get translations
         System::loadLanguageFile('default');
-        $title = $GLOBALS['TL_LANG']['MSC']['content_freeze_title'] ?? 'Content Freeze Active';
-        $message = $GLOBALS['TL_LANG']['MSC']['content_freeze_message'] ?? 'Only administrators can log in during the content freeze period.';
+        $title = isset($GLOBALS['TL_LANG']['MSC']['content_freeze_title']) ? $GLOBALS['TL_LANG']['MSC']['content_freeze_title'] : 'Content Freeze Active';
+        $message = isset($GLOBALS['TL_LANG']['MSC']['content_freeze_message']) ? $GLOBALS['TL_LANG']['MSC']['content_freeze_message'] : 'Only administrators can log in during the content freeze period.';
 
         $banner = '
             <div id="content-freeze-banner" style="

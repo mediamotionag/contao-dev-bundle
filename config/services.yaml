@@ -23,7 +23,6 @@ services:
             $tokenStorage: '@security.token_storage'
             $router: '@router'
             $framework: '@contao.framework'
-    # Legacy alias for Contao < 5.0 hook registration
     memo.dev.pagebackendtemplatelistener:
-        alias: Memo\DevBundle\EventListener\ParseBackendTemplateListener
+        class: Memo\DevBundle\EventListener\ParseBackendTemplateListener
         public: true
