@@ -4,51 +4,75 @@
  * @author     Rory Zünd (Media Motion AG)
  * @package    MemoDevBundle
  * @license    LGPL-3.0+
- * @see	       https://github.com/mediamotionag/contao-dev-bundle
+ * @see        https://github.com/mediamotionag/contao-dev-bundle
  */
 
 namespace Memo\DevBundle\Service;
 
 use Contao\Config;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-class DomainMatcher {
+class DomainMatcher
+{
+    /** @var RequestStack */
+    private $requestStack;
 
-    public static function checkDomain($strTyp='dev_domains')
+    public function __construct(RequestStack $requestStack)
     {
-        // Check if the typ is valid
-        if($strTyp != 'dev_domains' && $strTyp != 'local_domains')
-        {
+        $this->requestStack = $requestStack;
+    }
+
+    /**
+     * @param string $strTyp 'dev_domains' or 'local_domains'
+     * @return bool
+     */
+    public function checkDomain($strTyp = 'dev_domains')
+    {
+        if ($strTyp !== 'dev_domains' && $strTyp !== 'local_domains') {
             return false;
         }
 
-        // Get Config value
         $strDomains = Config::get($strTyp);
 
-        // Get the matching domains and compare
+        if ($strDomains == '') {
+            return false;
+        }
 
-        if($strDomains != '')
-        {
+        $arrDomains = explode(',', $strDomains);
 
-            $arrDomains = explode(',', $strDomains);
+        if (!is_array($arrDomains) || count($arrDomains) === 0) {
+            return false;
+        }
 
-            if(is_array($arrDomains) && count($arrDomains) > 0)
-            {
-                $strCurrentDomain = $_SERVER['HTTP_HOST'];
+        $strCurrentDomain = $this->getCurrentDomain();
 
-                foreach($arrDomains as $strDomain)
-                {
-                    $strDomain = str_replace(array(' ', '*'), '', $strDomain);
-                    $strDomain = urlencode($strDomain);
+        if ($strCurrentDomain === '') {
+            return false;
+        }
 
-                    if($strDomain != '' && stristr($strCurrentDomain, $strDomain))
-                    {
-                        return true;
-                    }
-                }
+        foreach ($arrDomains as $strDomain) {
+            $strDomain = str_replace(array(' ', '*'), '', $strDomain);
+            $strDomain = urlencode($strDomain);
+
+            if ($strDomain !== '' && stristr($strCurrentDomain, $strDomain)) {
+                return true;
             }
         }
 
         return false;
     }
 
+    /**
+     * @return string
+     */
+    private function getCurrentDomain()
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ($request !== null) {
+            return $request->getHost();
+        }
+
+        return isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+    }
 }

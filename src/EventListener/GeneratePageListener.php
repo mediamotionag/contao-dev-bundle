@@ -13,17 +13,28 @@ use Contao\CoreBundle\Routing\ResponseContext\HtmlHeadBag\HtmlHeadBag;
 use Contao\CoreBundle\Routing\ResponseContext\ResponseContextAccessor;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Memo\DevBundle\Service\DomainMatcher;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-#[AsEventListener(event: KernelEvents::RESPONSE, priority: 100)]
 class GeneratePageListener
 {
+    /** @var ScopeMatcher */
+    private $scopeMatcher;
+
+    /** @var ResponseContextAccessor */
+    private $responseContextAccessor;
+
+    /** @var DomainMatcher */
+    private $domainMatcher;
+
     public function __construct(
-        private readonly ScopeMatcher $scopeMatcher,
-        private readonly ResponseContextAccessor $responseContextAccessor,
+        ScopeMatcher $scopeMatcher,
+        ResponseContextAccessor $responseContextAccessor,
+        DomainMatcher $domainMatcher
     ) {
+        $this->scopeMatcher = $scopeMatcher;
+        $this->responseContextAccessor = $responseContextAccessor;
+        $this->domainMatcher = $domainMatcher;
     }
 
     public function __invoke(ResponseEvent $event): void
@@ -41,15 +52,15 @@ class GeneratePageListener
         }
 
         // Check the current domain against the dev_domains and local_domains
-        $isStageDomain = DomainMatcher::checkDomain('dev_domains');
-        $isLocalDomain = DomainMatcher::checkDomain('local_domains');
+        $isStageDomain = $this->domainMatcher->checkDomain('dev_domains');
+        $isLocalDomain = $this->domainMatcher->checkDomain('local_domains');
 
         $response = $event->getResponse();
 
         if ($isStageDomain) {
             // Set meta robots via response context if available
             $responseContext = $this->responseContextAccessor->getResponseContext();
-            if ($responseContext && $responseContext->has(HtmlHeadBag::class)) {
+            if ($responseContext !== null && $responseContext->has(HtmlHeadBag::class)) {
                 $htmlHeadBag = $responseContext->get(HtmlHeadBag::class);
                 $htmlHeadBag->setMetaRobots('noindex,nofollow');
             }
@@ -58,7 +69,7 @@ class GeneratePageListener
 
             // Also modify the HTML response directly to ensure noindex is set
             $content = $response->getContent();
-            if ($content && str_contains($content, '<meta name="robots"')) {
+            if ($content && strpos($content, '<meta name="robots"') !== false) {
                 $updatedContent = preg_replace(
                     '/<meta\s+name=["\']robots["\']\s+content=["\'][^"\']*["\']\s*\/?>/i',
                     '<meta name="robots" content="noindex,nofollow">',

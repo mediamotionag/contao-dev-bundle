@@ -2,26 +2,52 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+
     Memo\DevBundle\Service\DomainMatcher: ~
-    Memo\DevBundle\EventListener\GeneratePageListener: ~
-    Memo\DevBundle\EventListener\RobotsTxtListener: ~
-    Memo\DevBundle\EventListener\ParseBackendTemplateListener: ~
+
+    Memo\DevBundle\EventListener\GeneratePageListener:
+        arguments:
+            $scopeMatcher: '@contao.routing.scope_matcher'
+            $responseContextAccessor: '@contao.routing.response_context_accessor'
+            $domainMatcher: '@Memo\DevBundle\Service\DomainMatcher'
+        tags:
+            - { name: kernel.event_listener, event: kernel.response, method: __invoke, priority: 100 }
+
+    Memo\DevBundle\EventListener\RobotsTxtListener:
+        arguments:
+            $domainMatcher: '@Memo\DevBundle\Service\DomainMatcher'
+        tags:
+            - { name: kernel.event_listener, event: contao.robots_txt, method: __invoke, priority: -100 }
+
+    Memo\DevBundle\EventListener\ParseBackendTemplateListener:
+        arguments:
+            $domainMatcher: '@Memo\DevBundle\Service\DomainMatcher'
+        tags:
+            - { name: contao.hook, hook: parseBackendTemplate }
+        public: true
+
     Memo\DevBundle\EventListener\ParseFrontendTemplateListener:
         arguments:
             $framework: '@contao.framework'
         tags:
             - { name: contao.hook, hook: parseFrontendTemplate }
         public: true
+
     Memo\DevBundle\EventListener\DataContainer\SaveDevSettingsCallback:
+        arguments:
+            $cacheDir: '%kernel.cache_dir%'
+            $container: '@service_container'
         tags:
             - { name: contao.callback, table: tl_settings, target: config.onsubmit, method: onSubmitCallback, priority: 100 }
         public: true
+
     Memo\DevBundle\EventSubscriber\KernelRequestSubscriber:
         arguments:
             $scopeMatcher: '@contao.routing.scope_matcher'
             $tokenStorage: '@security.token_storage'
             $router: '@router'
             $framework: '@contao.framework'
+
     memo.dev.pagebackendtemplatelistener:
-        class: Memo\DevBundle\EventListener\ParseBackendTemplateListener
+        alias: Memo\DevBundle\EventListener\ParseBackendTemplateListener
         public: true
