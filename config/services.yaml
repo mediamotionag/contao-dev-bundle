@@ -2,6 +2,7 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+    Memo\DevBundle\Service\DomainMatcher: ~
     Memo\DevBundle\EventListener\GeneratePageListener: ~
     Memo\DevBundle\EventListener\ParseBackendTemplateListener: ~
     Memo\DevBundle\EventListener\ParseFrontendTemplateListener:
@@ -11,6 +12,8 @@ services:
             - { name: contao.hook, hook: parseFrontendTemplate }
         public: true
     Memo\DevBundle\EventListener\DataContainer\SaveDevSettingsCallback:
+        arguments:
+            $cacheDir: '%kernel.cache_dir%'
         tags:
             - { name: contao.callback, table: tl_settings, target: config.onsubmit, method: onSubmitCallback, priority: 100 }
         public: true
@@ -20,6 +23,7 @@ services:
             $tokenStorage: '@security.token_storage'
             $router: '@router'
             $framework: '@contao.framework'
+    # Legacy alias for Contao < 5.0 hook registration
     memo.dev.pagebackendtemplatelistener:
-        class: Memo\DevBundle\EventListener\ParseBackendTemplateListener
+        alias: Memo\DevBundle\EventListener\ParseBackendTemplateListener
         public: true

@@ -16,24 +16,15 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class KernelRequestSubscriber implements EventSubscriberInterface
 {
-    protected $scopeMatcher;
-    protected $tokenStorage;
-    protected $router;
-    protected $framework;
-
     public function __construct(
-        ScopeMatcher $scopeMatcher,
-        TokenStorageInterface $tokenStorage,
-        RouterInterface $router,
-        ContaoFramework $framework
+        protected readonly ScopeMatcher $scopeMatcher,
+        protected readonly TokenStorageInterface $tokenStorage,
+        protected readonly RouterInterface $router,
+        protected readonly ContaoFramework $framework,
     ) {
-        $this->scopeMatcher = $scopeMatcher;
-        $this->tokenStorage = $tokenStorage;
-        $this->router = $router;
-        $this->framework = $framework;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => [

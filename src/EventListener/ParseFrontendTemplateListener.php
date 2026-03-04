@@ -15,11 +15,9 @@ use Contao\System;
 
 class ParseFrontendTemplateListener
 {
-    protected $framework;
-
-    public function __construct(ContaoFramework $framework)
-    {
-        $this->framework = $framework;
+    public function __construct(
+        protected readonly ContaoFramework $framework,
+    ) {
     }
 
     /**

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Memo\DevBundle\DependencyInjection;
 
-use Contao\Config;
-use Contao\System;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
