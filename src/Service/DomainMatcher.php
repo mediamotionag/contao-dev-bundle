@@ -10,45 +10,56 @@
 namespace Memo\DevBundle\Service;
 
 use Contao\Config;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-class DomainMatcher {
+class DomainMatcher
+{
+    public function __construct(
+        private readonly RequestStack $requestStack,
+    ) {
+    }
 
-    public static function checkDomain($strTyp='dev_domains')
+    public function checkDomain(string $strTyp = 'dev_domains'): bool
     {
         // Check if the typ is valid
-        if($strTyp != 'dev_domains' && $strTyp != 'local_domains')
-        {
+        if ($strTyp !== 'dev_domains' && $strTyp !== 'local_domains') {
             return false;
         }
 
         // Get Config value
         $strDomains = Config::get($strTyp);
 
-        // Get the matching domains and compare
+        if ($strDomains === null || $strDomains === '') {
+            return false;
+        }
 
-        if($strDomains != '')
-        {
+        $arrDomains = explode(',', $strDomains);
+        $strCurrentDomain = $this->getCurrentHost();
 
-            $arrDomains = explode(',', $strDomains);
+        if ($strCurrentDomain === '') {
+            return false;
+        }
 
-            if(is_array($arrDomains) && count($arrDomains) > 0)
-            {
-                $strCurrentDomain = $_SERVER['HTTP_HOST'];
+        foreach ($arrDomains as $strDomain) {
+            $strDomain = str_replace([' ', '*'], '', $strDomain);
+            $strDomain = urlencode($strDomain);
 
-                foreach($arrDomains as $strDomain)
-                {
-                    $strDomain = str_replace(array(' ', '*'), '', $strDomain);
-                    $strDomain = urlencode($strDomain);
-
-                    if($strDomain != '' && stristr($strCurrentDomain, $strDomain))
-                    {
-                        return true;
-                    }
-                }
+            if ($strDomain !== '' && stristr($strCurrentDomain, $strDomain)) {
+                return true;
             }
         }
 
         return false;
     }
 
+    private function getCurrentHost(): string
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ($request !== null) {
+            return $request->getHost();
+        }
+
+        return $_SERVER['HTTP_HOST'] ?? '';
+    }
 }

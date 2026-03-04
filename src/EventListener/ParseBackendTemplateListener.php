@@ -17,6 +17,11 @@ use Memo\DevBundle\Service\DomainMatcher;
 #[AsHook('parseBackendTemplate')]
 class ParseBackendTemplateListener
 {
+    public function __construct(
+        private readonly DomainMatcher $domainMatcher,
+    ) {
+    }
+
     public function __invoke(string $buffer, string $template): string
     {
         if (in_array($template, ['be_main', 'be_login'])) {
@@ -32,7 +37,7 @@ class ParseBackendTemplateListener
             $strClass = "badge-title--live";
 
             // Detect Local and set Badge
-            $bolLocalDomain = DomainMatcher::checkDomain('local_domains');
+            $bolLocalDomain = $this->domainMatcher->checkDomain('local_domains');
             if($bolLocalDomain === true)
             {
                 $strBadge = "Local";
@@ -40,7 +45,7 @@ class ParseBackendTemplateListener
             }
 
             // Detect Stage and set Badge
-            $bolStageDomain = DomainMatcher::checkDomain('dev_domains');
+            $bolStageDomain = $this->domainMatcher->checkDomain('dev_domains');
             if($bolStageDomain === true)
             {
                 $strBadge = "Stage";
@@ -50,7 +55,7 @@ class ParseBackendTemplateListener
             // Detect Content Freeze and set Badge
             $bolContentFreeze = Config::get('content_freeze');
             if($bolContentFreeze == true){
-                $strBadge .= " + Content Freeze";
+                $strBadge .= "<br />Content Freeze";
                 $strClass .= " badge-title--freeze";
 
                 // Inject content freeze banner on login page
@@ -77,8 +82,8 @@ class ParseBackendTemplateListener
 
         // Load language file and get translations
         System::loadLanguageFile('default');
-        $title = isset($GLOBALS['TL_LANG']['MSC']['content_freeze_title']) ? $GLOBALS['TL_LANG']['MSC']['content_freeze_title'] : 'Content Freeze Active';
-        $message = isset($GLOBALS['TL_LANG']['MSC']['content_freeze_message']) ? $GLOBALS['TL_LANG']['MSC']['content_freeze_message'] : 'Only administrators can log in during the content freeze period.';
+        $title = $GLOBALS['TL_LANG']['MSC']['content_freeze_title'] ?? 'Content Freeze Active';
+        $message = $GLOBALS['TL_LANG']['MSC']['content_freeze_message'] ?? 'Only administrators can log in during the content freeze period.';
 
         $banner = '
             <div id="content-freeze-banner" style="
