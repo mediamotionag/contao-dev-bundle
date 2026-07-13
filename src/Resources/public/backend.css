@@ -13,3 +13,31 @@
 .badge-title--freeze {
     background-color: #f20606;
 }
+
+#home:has(.app-subtitle) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: auto;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+#home:has(.app-subtitle) .app-title {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.15;
+}
+
+#home .app-subtitle {
+    font-size: .65em;
+    font-weight: 400;
+    opacity: .8;
+    white-space: nowrap;
+}
+
+#home:has(.app-subtitle) .badge-title {
+    float: none;
+    margin: 0;
+}
