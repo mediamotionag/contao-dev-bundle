@@ -14,7 +14,7 @@
     background-color: #f20606;
 }
 
-#home {
+#home:has(.app-subtitle) {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -23,7 +23,7 @@
     padding-bottom: 4px;
 }
 
-#home .app-title {
+#home:has(.app-subtitle) .app-title {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -37,7 +37,7 @@
     white-space: nowrap;
 }
 
-#home .badge-title {
+#home:has(.app-subtitle) .badge-title {
     float: none;
     margin: 0;
 }
