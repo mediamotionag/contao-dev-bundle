@@ -28,7 +28,7 @@
     },
     "require": {
         "php": "^8.1",
-        "contao/core-bundle": "^5.6"
+        "contao/core-bundle": "^5.3"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",
