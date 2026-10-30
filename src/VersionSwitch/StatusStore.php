@@ -94,8 +94,9 @@ class StatusStore
         }
 
         $status = $this->withLiveState($status);
-        $status['log'] = $this->tail($this->getPath($runId, 'log'));
+        // Size first: bytes appended after the tail was read would be skipped by the next poll
         $status['logOffset'] = $this->getLogSize($runId);
+        $status['log'] = $this->tail($this->getPath($runId, 'log'), 60000, $status['logOffset']);
 
         if (self::STATE_ABORTED === $status['state']) {
             $status['log'] .= "\n" . $this->tail($this->getPath($runId, 'out'), 5000);
@@ -169,7 +170,7 @@ class StatusStore
             }
 
             // A run from a version to the same version changed nothing to roll back
-            if (preg_replace('#^refs/tags/#', '', $run['previousRef']) === ($run['tag'] ?? '')) {
+            if (RunFormatter::displayRef($run['previousRef']) === RunFormatter::displayRef((string) ($run['tag'] ?? ''))) {
                 continue;
             }
 
@@ -282,7 +283,13 @@ class StatusStore
         $this->filesystem->mkdir($this->dir);
         $handle = fopen($this->dir . '/switch.lock', 'c');
 
-        if (false === $handle || !flock($handle, LOCK_EX | LOCK_NB)) {
+        if (false === $handle) {
+            return false;
+        }
+
+        if (!flock($handle, LOCK_EX | LOCK_NB)) {
+            fclose($handle);
+
             return false;
         }
 
@@ -357,14 +364,14 @@ class StatusStore
         return is_file($path) ? (int) filesize($path) : 0;
     }
 
-    private function tail(string $path, int $bytes = 60000): string
+    private function tail(string $path, int $bytes = 60000, ?int $size = null): string
     {
         if (!is_file($path)) {
             return '';
         }
 
-        $size = (int) filesize($path);
-        $content = (string) file_get_contents($path, false, null, max(0, $size - $bytes));
+        $size ??= (int) filesize($path);
+        $content = $size > 0 ? (string) file_get_contents($path, false, null, max(0, $size - $bytes), min($size, $bytes)) : '';
 
         return $size > $bytes ? '…' . $content : $content;
     }

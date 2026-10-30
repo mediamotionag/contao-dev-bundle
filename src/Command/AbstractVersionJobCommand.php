@@ -73,7 +73,15 @@ abstract class AbstractVersionJobCommand extends Command
             'startedAt' => date(DATE_ATOM),
         ];
 
-        if (!$this->store->lock()) {
+        // isLocked() in web requests holds the lock for a moment to probe it, so one miss is not a running job
+        $locked = $this->store->lock();
+
+        for ($attempt = 0; !$locked && $attempt < 10; ++$attempt) {
+            usleep(100000);
+            $locked = $this->store->lock();
+        }
+
+        if (!$locked) {
             return $this->finish(StatusStore::STATE_FAILED_UNCHANGED, 'Another job is already running.');
         }
 

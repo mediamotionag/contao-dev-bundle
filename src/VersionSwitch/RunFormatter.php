@@ -95,7 +95,8 @@ class RunFormatter
             $steps[] = ['key' => $key, 'state' => $stepState];
         }
 
-        if (isset($run['failedStep']) && 'restore' !== ($run['action'] ?? 'switch')) {
+        // A preflight failure changed nothing, so no revert was attempted
+        if (isset($run['failedStep']) && 'preflight' !== $run['failedStep'] && 'restore' !== ($run['action'] ?? 'switch')) {
             $steps[] = [
                 'key' => 'revert',
                 'state' => match ($state) {

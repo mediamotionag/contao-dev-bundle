@@ -133,7 +133,19 @@
                 </div>
             </dialog>`);
 
-        return document.querySelector('dialog.memo-version-dialog');
+        const dialog = document.querySelector('dialog.memo-version-dialog');
+
+        // contao--dialog only exists from Contao 5.6, and Esc closes the dialog without removing it
+        dialog.addEventListener('close', () => dialog.remove());
+        dialog.querySelectorAll('[data-action="contao--dialog#close"]').forEach((close) => {
+            close.addEventListener('click', () => dialog.remove());
+        });
+
+        if (!dialog.open) {
+            dialog.showModal();
+        }
+
+        return dialog;
     };
 
     const openModal = async(config, start = null) => {

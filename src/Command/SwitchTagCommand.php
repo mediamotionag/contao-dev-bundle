@@ -105,7 +105,8 @@ class SwitchTagCommand extends AbstractVersionJobCommand
             $this->setStep('cache');
             // Without --no-warmup the new cache is built aside and swapped in, so running requests keep theirs longer
             $this->console(['cache:clear']);
-            $this->console(['assets:install', 'public', '--symlink', '--relative']);
+            // No target argument: assets:install reads extra.public-dir from composer.json
+            $this->console(['assets:install', '--symlink', '--relative']);
 
             return $this->finish(StatusStore::STATE_SUCCESS);
         } catch (\Throwable $e) {

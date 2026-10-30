@@ -18,12 +18,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Live progress of one run, polled every second by the version dialog.
- *
- * Deliberately outside /contao and without _scope, so no firewall reads or writes the backend session:
- * composer and the job clear the cache during a switch, a backend request crashing in that moment
- * saves the session without the login, and the admin is logged out. Access is a per-run HMAC token
- * that only the logged-in status route hands out.
+ * Outside /contao and without _scope, so no firewall touches the backend session: a backend request crashing
+ * while the job clears the cache saves the session without the login and logs the admin out.
+ * Access is a per-run HMAC token that only the logged-in status route hands out.
  */
 #[AsController]
 class VersionPollController

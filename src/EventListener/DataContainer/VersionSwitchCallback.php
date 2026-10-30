@@ -16,19 +16,23 @@ use Memo\DevBundle\VersionSwitch\RunFormatter;
 use Memo\DevBundle\VersionSwitch\StatusStore;
 use Memo\DevBundle\VersionSwitch\SwitchLauncher;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * memo_version_tag is only a picker for the "Wechseln" button: it loads the checked-out tag and save returns '',
  * so saving the settings never switches and nothing is written to localconfig.php.
  */
-class VersionSwitchCallback
+class VersionSwitchCallback implements ResetInterface
 {
     private const MODAL_LABELS = [
         'title', 'switch', 'log', 'rollback', 'restore', 'close', 'busy', 'run', 'elapsed', 'details',
         'confirm_switch', 'confirm_rollback', 'confirm_restore', 'no_tag', 'already_current', 'session', 'relogin',
         'restore_no_migration', 'restore_restored', 'restore_missing',
     ];
+
+    /** One settings page asks for the ref four times, each a set of git processes */
+    private ?array $currentRef = null;
 
     public function __construct(
         private readonly GitRepository $git,
@@ -38,6 +42,11 @@ class VersionSwitchCallback
         private readonly TranslatorInterface $translator,
         private readonly RouterInterface $router,
     ) {
+    }
+
+    public function reset(): void
+    {
+        $this->currentRef = null;
     }
 
     public function onLoad(): void
@@ -60,7 +69,7 @@ class VersionSwitchCallback
     public function getTagOptions(): array
     {
         try {
-            $commit = $this->git->getCurrentRef()['commit'];
+            $commit = $this->getCurrentRef()['commit'];
             $tags = $this->git->listTags();
         } catch (\Throwable) {
             return [];
@@ -90,7 +99,7 @@ class VersionSwitchCallback
     public function loadCurrentTag(): string
     {
         try {
-            return $this->git->getCurrentRef()['tag'] ?? '';
+            return $this->getCurrentRef()['tag'] ?? '';
         } catch (\Throwable) {
             return '';
         }
@@ -151,7 +160,7 @@ class VersionSwitchCallback
                 return $this->translator->trans('MSC.memo_vs_no_repository', [], 'contao_default');
             }
 
-            $ref = $this->git->getCurrentRef();
+            $ref = $this->getCurrentRef();
             $text = sprintf(
                 $this->translator->trans('MSC.memo_vs_current', [], 'contao_default'),
                 implode(', ', array_filter([$ref['tag'], $ref['branch'], substr($ref['commit'], 0, 10)]))
@@ -165,5 +174,13 @@ class VersionSwitchCallback
         } catch (\Throwable $e) {
             return $e->getMessage();
         }
+    }
+
+    /**
+     * @return array{commit: string, branch: ?string, tag: ?string}
+     */
+    private function getCurrentRef(): array
+    {
+        return $this->currentRef ??= $this->git->getCurrentRef();
     }
 }

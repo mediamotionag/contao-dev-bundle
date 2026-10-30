@@ -66,17 +66,19 @@ class VersionSwitchController extends AbstractController
         }
 
         $rollback = $this->store->getRollbackTarget();
-        $latest = $this->store->getRuns()[0] ?? null;
+        $restore = $this->store->getRestoreState();
+        $runs = $this->store->getRuns();
 
         $response = new JsonResponse([
             'run' => $run,
             'runs' => array_map(fn (array $item): array => [
                 'runId' => $item['runId'],
                 'label' => $this->formatter->label($item),
-            ], $this->store->getRuns()),
-            'running' => (bool) ($latest['running'] ?? false),
+            ], $runs),
+            'running' => (bool) ($runs[0]['running'] ?? false),
             'rollbackRef' => isset($rollback['previousRef']) ? RunFormatter::displayRef($rollback['previousRef']) : null,
-            ...array_combine(['restoreBackup', 'restoreReason'], array_values($this->store->getRestoreState())),
+            'restoreBackup' => $restore['backup'],
+            'restoreReason' => $restore['reason'],
         ]);
 
         $response->setPrivate();
