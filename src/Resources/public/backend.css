@@ -43,3 +43,187 @@
         margin: 0;
     }
 }
+
+/* Select plus "Wechseln" on one row, "Tags abrufen" and "Protokoll" below; the theme reserves only 24px for an icon wizard */
+.widget.memo-version-tag {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px;
+    align-items: center;
+}
+
+.widget.memo-version-tag > :not(.tl_select_wrapper, .tl_select, .tl_submit) {
+    grid-column: 1 / -1;
+}
+
+.widget.memo-version-tag > .tl_select_wrapper,
+.widget.memo-version-tag > .tl_select {
+    width: auto;
+}
+
+.widget.memo-version-tag .tl_submit {
+    margin: 0;
+    white-space: nowrap;
+}
+
+.memo-version-tag__tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+dialog.memo-version-dialog .header_wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.memo-version-dialog__close {
+    padding: 0 4px;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: inherit;
+    cursor: pointer;
+    background: none;
+    border: none;
+    border-radius: var(--border-radius);
+    opacity: .6;
+}
+
+.memo-version-dialog__close:hover,
+.memo-version-dialog__close:focus-visible {
+    opacity: 1;
+}
+
+dialog.memo-version-dialog .dialog_wrapper {
+    width: min(900px, 92vw);
+    max-width: none;
+}
+
+.memo-version-dialog__body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 4px 12px 0;
+}
+
+.memo-version-dialog__status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    justify-content: space-between;
+    line-height: 1.4;
+}
+
+.memo-version-dialog__status > span:last-child {
+    margin-left: auto;
+    color: var(--gray);
+    white-space: nowrap;
+}
+
+.memo-version-dialog__progress .jobs-progress-bar {
+    width: 100%;
+    height: 18px;
+}
+
+.memo-version-dialog__steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: memo-step;
+}
+
+.memo-version-dialog__step {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    color: var(--gray);
+    counter-increment: memo-step;
+}
+
+.memo-version-dialog__step::before {
+    content: counter(memo-step);
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    font-size: .7rem;
+    font-weight: 600;
+    color: var(--gray);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+}
+
+.memo-version-dialog__step.is-done,
+.memo-version-dialog__step.is-active,
+.memo-version-dialog__step.is-failed {
+    color: var(--text);
+}
+
+.memo-version-dialog__step.is-done::before {
+    content: '✓';
+    color: #fff;
+    background: var(--green);
+    border-color: var(--green);
+}
+
+.memo-version-dialog__step.is-active::before {
+    color: #fff;
+    background: var(--blue);
+    border-color: var(--blue);
+    animation: memo-version-pulse 1.2s ease-in-out infinite;
+}
+
+.memo-version-dialog__step.is-failed::before {
+    content: '✕';
+    color: #fff;
+    background: var(--red);
+    border-color: var(--red);
+}
+
+.memo-version-dialog__step.is-skipped {
+    text-decoration: line-through;
+}
+
+@keyframes memo-version-pulse {
+    50% {
+        opacity: .45;
+    }
+}
+
+.memo-version-dialog__details summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.memo-version-dialog__log {
+    height: 38vh;
+    margin: 8px 0 0;
+    padding: 10px;
+    overflow: auto;
+    font-size: .75rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    background: var(--form-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+}
+
+.memo-version-dialog .buttons button:disabled {
+    cursor: not-allowed;
+    opacity: .5;
+}
+
+.memo-version-dialog [hidden] {
+    display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .memo-version-dialog__step.is-active::before {
+        animation: none;
+    }
+}

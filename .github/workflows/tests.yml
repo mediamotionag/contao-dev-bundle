@@ -1,0 +1,52 @@
+name: Tests
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+
+permissions:
+    contents: read
+
+jobs:
+    php:
+        name: PHP ${{ matrix.php }}
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                # Lowest allowed by composer.json (PHPUnit 10) and the current one (PHPUnit 12)
+                php: ['8.1', '8.4']
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php }}
+                  coverage: none
+
+            - run: composer validate --no-check-publish
+
+            # roave/security-advisories conflicts with PHP 8.1 itself (end of life, open advisories)
+            - if: matrix.php == '8.1'
+              run: composer remove --dev --no-update roave/security-advisories
+
+            # Plugins (Contao components, manager plugin) are not needed for unit tests
+            - run: composer update --no-plugins --no-interaction --no-progress --prefer-dist
+
+            # Catches syntax the lowest PHP version does not support
+            - run: find src tests -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+
+            - run: vendor/bin/phpunit
+
+    js:
+        name: JavaScript syntax
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+
+            - run: node --check src/Resources/public/backend.js && node --check tests/E2E/version-dialog.mjs

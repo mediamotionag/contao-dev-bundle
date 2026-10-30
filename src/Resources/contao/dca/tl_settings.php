@@ -17,6 +17,11 @@ PaletteManipulator::create()
     ->addField('content_freeze', 'memo_dev_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_settings');
 
+PaletteManipulator::create()
+    ->addLegend('memo_version_legend', 'memo_dev_legend', PaletteManipulator::POSITION_AFTER)
+    ->addField('memo_version_tag', 'memo_version_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('default', 'tl_settings');
+
 
 $GLOBALS['TL_DCA']['tl_settings']['fields']['dev_domains'] = array(
     'label' => &$GLOBALS['TL_LANG']['tl_settings']['fields']['dev_domains'],
@@ -44,4 +49,12 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['content_freeze'] = array(
     'exclude' => true,
     'inputType' => 'checkbox',
     'eval' => array('tl_class' => 'clr w50', 'mandatory' => false),
+);
+
+// Picker for the version switch buttons; VersionSwitchCallback keeps it out of localconfig.php
+$GLOBALS['TL_DCA']['tl_settings']['fields']['memo_version_tag'] = array(
+    'label' => &$GLOBALS['TL_LANG']['tl_settings']['fields']['memo_version_tag'],
+    'exclude' => true,
+    'inputType' => 'select',
+    'eval' => array('tl_class' => 'clr w50 memo-version-tag', 'includeBlankOption' => true, 'chosen' => true, 'doNotSaveEmpty' => true),
 );

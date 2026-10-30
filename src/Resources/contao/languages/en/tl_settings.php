@@ -11,6 +11,7 @@
  * Legends
  */
 $GLOBALS['TL_LANG']['tl_settings']['memo_dev_legend'] = 'Developer Settings';
+$GLOBALS['TL_LANG']['tl_settings']['memo_version_legend'] = 'Version';
 
 /**
  * Fields
@@ -19,3 +20,4 @@ $GLOBALS['TL_LANG']['tl_settings']['fields']['dev_domains'] = array('Stage Domai
 $GLOBALS['TL_LANG']['tl_settings']['fields']['local_domains'] = array('Local Domains', 'Add a comma-separated list of domain parts that should be recognized as a Local environment. Example: .local,.memo, etc. These are searched individually in the URL. If one or more of these parts are found, the page is served with noindex/nofollow and a "Local" label is displayed in the backend.');
 $GLOBALS['TL_LANG']['tl_settings']['fields']['content_freeze'] = array('Is a Content Freeze in effect?', 'If a Content Freeze is in effect, a "Content Freeze" label is displayed at login & in the backend toolbar.');
 $GLOBALS['TL_LANG']['tl_settings']['fields']['backend_title'] = array('Backend Title', 'If a backend title is defined, it is displayed below the Contao wordmark in the backend header.');
+$GLOBALS['TL_LANG']['tl_settings']['fields']['memo_version_tag'] = array('Switch to tag', 'Shows all tags, newest first; the field is searchable. "Switch" starts the switch in the background (git checkout, composer install, contao:migrate with backup and no DROP, cache) and shows the log live; "Log" opens past runs. Saving does not switch. %s');

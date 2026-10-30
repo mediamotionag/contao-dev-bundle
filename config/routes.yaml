@@ -1,0 +1,3 @@
+memo_dev_controllers:
+    resource: ../src/Controller/
+    type: attribute
