@@ -188,9 +188,8 @@ class StatusStore
     }
 
     /**
-     * The backup that matches the code currently checked out, decided by the latest run that changed something:
-     * a switch (also a reverted one) offers its own backup, a rollback the backup of the switch it rolled back.
-     * Older backups are never offered: they belong to older code. A backup restored since is not offered again.
+     * Only offered once the code is back on the old version: a rollback offers the backup of the switch it
+     * rolled back, a reverted switch its own. Older backups belong to older code. A restored backup is not offered again.
      *
      * @return array{backup: ?string, reason: ?string} reason (none, no_migration, restored, missing) when there is no backup
      */
@@ -213,6 +212,14 @@ class StatusStore
                 }
 
                 continue;
+            }
+
+            $codeIsOld = 'rollback' === $action
+                ? self::STATE_SUCCESS === $run['state']
+                : self::STATE_FAILED_REVERTED === $run['state'];
+
+            if (!$codeIsOld) {
+                return ['backup' => null, 'reason' => 'none'];
             }
 
             $backup = 'rollback' === $action
