@@ -65,3 +65,6 @@ $GLOBALS['TL_LANG']['MSC']['memo_vs_current_option'] = '(current)';
 $GLOBALS['TL_LANG']['MSC']['memo_vs_modal_already_current'] = '%s is already active. Select another tag.';
 $GLOBALS['TL_LANG']['MSC']['memo_vs_modal_session'] = 'The login has expired. The job keeps running in the background.';
 $GLOBALS['TL_LANG']['MSC']['memo_vs_modal_relogin'] = 'Log in again';
+$GLOBALS['TL_LANG']['MSC']['memo_vs_modal_restore_no_migration'] = 'No database change';
+$GLOBALS['TL_LANG']['MSC']['memo_vs_modal_restore_restored'] = 'Backup already restored';
+$GLOBALS['TL_LANG']['MSC']['memo_vs_modal_restore_missing'] = 'Backup no longer available';

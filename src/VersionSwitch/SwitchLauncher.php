@@ -71,6 +71,11 @@ class SwitchLauncher
             throw new \InvalidArgumentException(sprintf('Tag "%s" does not exist.', $tag));
         }
 
+        // The browser checks this too, but against the version at page load
+        if ($this->git->getCurrentRef()['tag'] === $tag) {
+            throw new \RuntimeException(sprintf('%s is already checked out.', $tag));
+        }
+
         return $this->launch(['memo:dev:switch-tag', $tag], ['action' => 'switch', 'tag' => $tag]);
     }
 

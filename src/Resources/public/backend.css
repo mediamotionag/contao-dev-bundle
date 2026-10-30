@@ -72,6 +72,30 @@
     gap: 6px;
 }
 
+dialog.memo-version-dialog .header_wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.memo-version-dialog__close {
+    padding: 0 4px;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: inherit;
+    cursor: pointer;
+    background: none;
+    border: none;
+    border-radius: var(--border-radius);
+    opacity: .6;
+}
+
+.memo-version-dialog__close:hover,
+.memo-version-dialog__close:focus-visible {
+    opacity: 1;
+}
+
 dialog.memo-version-dialog .dialog_wrapper {
     width: min(900px, 92vw);
     max-width: none;
@@ -187,6 +211,11 @@ dialog.memo-version-dialog .dialog_wrapper {
     background: var(--form-bg);
     border: 1px solid var(--border);
     border-radius: var(--border-radius);
+}
+
+.memo-version-dialog .buttons button:disabled {
+    cursor: not-allowed;
+    opacity: .5;
 }
 
 .memo-version-dialog [hidden] {

@@ -65,3 +65,6 @@ $GLOBALS['TL_LANG']['MSC']['memo_vs_current_option'] = '(aktuell)';
 $GLOBALS['TL_LANG']['MSC']['memo_vs_modal_already_current'] = '%s ist bereits aktiv. Wählen Sie einen anderen Tag.';
 $GLOBALS['TL_LANG']['MSC']['memo_vs_modal_session'] = 'Die Anmeldung ist abgelaufen. Der Job läuft im Hintergrund weiter.';
 $GLOBALS['TL_LANG']['MSC']['memo_vs_modal_relogin'] = 'Neu anmelden';
+$GLOBALS['TL_LANG']['MSC']['memo_vs_modal_restore_no_migration'] = 'Keine Datenbankänderung';
+$GLOBALS['TL_LANG']['MSC']['memo_vs_modal_restore_restored'] = 'Backup bereits wiederhergestellt';
+$GLOBALS['TL_LANG']['MSC']['memo_vs_modal_restore_missing'] = 'Backup nicht mehr vorhanden';

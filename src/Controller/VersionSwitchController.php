@@ -76,7 +76,7 @@ class VersionSwitchController extends AbstractController
             ], $this->store->getRuns()),
             'running' => (bool) ($latest['running'] ?? false),
             'rollbackRef' => isset($rollback['previousRef']) ? RunFormatter::displayRef($rollback['previousRef']) : null,
-            'restoreBackup' => $this->store->getRestoreBackup(),
+            ...array_combine(['restoreBackup', 'restoreReason'], array_values($this->store->getRestoreState())),
         ]);
 
         $response->setPrivate();

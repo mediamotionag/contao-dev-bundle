@@ -24,11 +24,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class VersionSwitchCallback
 {
-    private const TAG_LIMIT = 20;
-
     private const MODAL_LABELS = [
         'title', 'switch', 'log', 'rollback', 'restore', 'close', 'busy', 'run', 'elapsed', 'details',
         'confirm_switch', 'confirm_rollback', 'confirm_restore', 'no_tag', 'already_current', 'session', 'relogin',
+        'restore_no_migration', 'restore_restored', 'restore_missing',
     ];
 
     public function __construct(
@@ -46,12 +45,12 @@ class VersionSwitchCallback
         $fields = &$GLOBALS['TL_DCA']['tl_settings']['fields'];
 
         // The label references $GLOBALS['TL_LANG']; copy before unset so the formatted text does not write back into it
-        $label = $fields['memo_version_tag']['label'] ?? ['', '%s %s'];
+        $label = $fields['memo_version_tag']['label'] ?? ['', '%s'];
         unset($fields['memo_version_tag']['label']);
 
         $fields['memo_version_tag']['label'] = [
             $label[0],
-            sprintf($label[1], self::TAG_LIMIT, $this->describeCurrent() . ' ' . $this->formatter->summarize($this->store->getLatestRun())),
+            sprintf($label[1], $this->describeCurrent() . ' ' . $this->formatter->summarize($this->store->getLatestRun())),
         ];
     }
 
@@ -71,13 +70,9 @@ class VersionSwitchCallback
 
         $current = $this->translator->trans('MSC.memo_vs_current_option', [], 'contao_default');
 
-        foreach ($tags as $i => $tag) {
+        // All tags, newest first: the chosen select has a search box, so a long list stays usable
+        foreach ($tags as $tag) {
             $isCurrent = $tag['commit'] === $commit;
-
-            // The newest tags, plus the checked-out one even if it is older
-            if ($i >= self::TAG_LIMIT && !$isCurrent) {
-                continue;
-            }
 
             $options[$tag['name']] = implode(' – ', array_filter([
                 $tag['name'] . ($isCurrent ? ' ' . $current : ''),

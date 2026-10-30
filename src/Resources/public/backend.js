@@ -93,7 +93,16 @@
         document.body.insertAdjacentHTML('beforeend', `
             <dialog class="memo-version-dialog" data-controller="contao--dialog" data-turbo-temporary>
                 <div class="dialog_wrapper">
-                    <div class="header_wrapper"><h3>${escape(labels.title)}</h3></div>
+                    <div class="header_wrapper">
+                        <h3>${escape(labels.title)}</h3>
+                        <button
+                            type="button"
+                            class="memo-version-dialog__close"
+                            data-action="contao--dialog#close"
+                            aria-label="${escape(labels.close)}"
+                            title="${escape(labels.close)}"
+                        >&times;</button>
+                    </div>
                     <form method="dialog">
                         <div class="memo-version-dialog__body">
                             <select class="tl_select" data-run aria-label="${escape(labels.run)}"></select>
@@ -200,7 +209,13 @@
             runSelect.value = data.run?.runId ?? '';
             button('rollback').hidden = !data.rollbackRef || data.running;
             button('rollback').textContent = format(labels.rollback, data.rollbackRef ?? '');
-            button('restore').hidden = !data.restoreBackup || data.running;
+            // Without a matching backup the button stays visible but disabled and names the reason
+            const restore = button('restore');
+
+            restore.hidden = !data.restoreBackup && (!data.restoreReason || 'none' === data.restoreReason);
+            restore.disabled = data.running || !data.restoreBackup;
+            restore.textContent = data.restoreBackup ? labels.restore : labels[`restore_${data.restoreReason}`];
+            restore.title = data.restoreBackup ?? '';
         };
 
         const schedule = (callback, delay) => {

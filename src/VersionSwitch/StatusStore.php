@@ -168,6 +168,11 @@ class StatusStore
                 continue;
             }
 
+            // A run from a version to the same version changed nothing to roll back
+            if (preg_replace('#^refs/tags/#', '', $run['previousRef']) === ($run['tag'] ?? '')) {
+                continue;
+            }
+
             if (self::STATE_SUCCESS === $run['state'] || (\in_array($run['state'], [self::STATE_FAILED, self::STATE_ABORTED], true) && ($run['checkedOut'] ?? false))) {
                 return $run;
             }
@@ -176,12 +181,19 @@ class StatusStore
         return null;
     }
 
+    public function getRestoreBackup(): ?string
+    {
+        return $this->getRestoreState()['backup'];
+    }
+
     /**
      * The backup that matches the code currently checked out, decided by the latest run that changed something:
      * a switch (also a reverted one) offers its own backup, a rollback the backup of the switch it rolled back.
      * Older backups are never offered: they belong to older code. A backup restored since is not offered again.
+     *
+     * @return array{backup: ?string, reason: ?string} reason (none, no_migration, restored, missing) when there is no backup
      */
-    public function getRestoreBackup(): ?string
+    public function getRestoreState(): array
     {
         $runs = $this->getRuns();
         $byId = array_column($runs, null, 'runId');
@@ -206,14 +218,15 @@ class StatusStore
                 ? ($byId[$run['rollbackOf'] ?? '']['backup'] ?? $run['backup'] ?? null)
                 : ($run['backup'] ?? null);
 
-            if (empty($backup) || \in_array($backup, $restored, true)) {
-                return null;
-            }
-
-            return is_file($this->projectDir . '/var/backups/' . basename($backup)) ? $backup : null;
+            return match (true) {
+                empty($backup) => ['backup' => null, 'reason' => 'no_migration'],
+                \in_array($backup, $restored, true) => ['backup' => null, 'reason' => 'restored'],
+                !is_file($this->projectDir . '/var/backups/' . basename($backup)) => ['backup' => null, 'reason' => 'missing'],
+                default => ['backup' => $backup, 'reason' => null],
+            };
         }
 
-        return null;
+        return ['backup' => null, 'reason' => 'none'];
     }
 
     /**
