@@ -11,6 +11,7 @@
  * Legends
  */
 $GLOBALS['TL_LANG']['tl_settings']['memo_dev_legend'] = 'Entwickler Einstellungen';
+$GLOBALS['TL_LANG']['tl_settings']['memo_version_legend'] = 'Version';
 
 /**
  * Fields
@@ -19,3 +20,4 @@ $GLOBALS['TL_LANG']['tl_settings']['fields']['dev_domains'] = array('Stage Domä
 $GLOBALS['TL_LANG']['tl_settings']['fields']['local_domains'] = array('Lokale Domänen', 'Fügen Sie kommaseparierte Liste von Domänen (-Bestandteilen), die als Lokale-Umgebung erkannt werden sollten. Beispiel: .local,.memo, etc. Diese werden einzeln in der URL gesucht. Falls einer oder mehrere dieser Bestandteile gefunden wird, wird die Seite z.B. mit einem noindex/nofollow ausgespielt und im Backend wird ein Label "Local" angezeigt.');
 $GLOBALS['TL_LANG']['tl_settings']['fields']['content_freeze'] = array('Ist ein Content-Freeze verhängt?', 'Falls ein Content-Freeze verhängt wurde, wird ein Label "Content-Freeze" beim Login & in der Backend-Toolbar angezeigt.');
 $GLOBALS['TL_LANG']['tl_settings']['fields']['backend_title'] = array('Backend Titel', 'Falls ein Backend Titel definiert wurde, wird dieser unterhalb des Contao-Schriftzugs im Backend-Header angezeigt.');
+$GLOBALS['TL_LANG']['tl_settings']['fields']['memo_version_tag'] = array('Auf Tag wechseln', 'Zeigt die %d neuesten Tags. «Wechseln» startet den Wechsel im Hintergrund (git checkout, composer install, contao:migrate mit Backup und ohne DROP, Cache) und zeigt das Protokoll live; «Protokoll» öffnet frühere Läufe. Speichern wechselt nicht. %s');

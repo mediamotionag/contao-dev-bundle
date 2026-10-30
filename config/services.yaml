@@ -1,3 +1,7 @@
+parameters:
+    env(MEMO_DEV_PHP_BINARY): ''
+    env(MEMO_DEV_COMPOSER_BINARY): ''
+
 services:
     _defaults:
         autowire: true
@@ -50,4 +54,46 @@ services:
 
     memo.dev.pagebackendtemplatelistener:
         alias: Memo\DevBundle\EventListener\ParseBackendTemplateListener
+        public: true
+
+    Memo\DevBundle\VersionSwitch\BinaryResolver:
+        arguments:
+            $phpBinary: '%env(MEMO_DEV_PHP_BINARY)%'
+            $composerBinary: '%env(MEMO_DEV_COMPOSER_BINARY)%'
+
+    Memo\DevBundle\VersionSwitch\GitRepository:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    Memo\DevBundle\VersionSwitch\StatusStore:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    Memo\DevBundle\VersionSwitch\SwitchLauncher:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    Memo\DevBundle\Command\SwitchTagCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    Memo\DevBundle\Command\RestoreBackupCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    Memo\DevBundle\VersionSwitch\RunFormatter: ~
+
+    Memo\DevBundle\Controller\VersionSwitchController: ~
+
+    Memo\DevBundle\Controller\VersionPollController:
+        arguments:
+            $secret: '%kernel.secret%'
+
+    Memo\DevBundle\EventListener\DataContainer\VersionSwitchCallback:
+        tags:
+            - { name: contao.callback, table: tl_settings, target: config.onload, method: onLoad }
+            - { name: contao.callback, table: tl_settings, target: fields.memo_version_tag.options, method: getTagOptions }
+            - { name: contao.callback, table: tl_settings, target: fields.memo_version_tag.load, method: loadCurrentTag }
+            - { name: contao.callback, table: tl_settings, target: fields.memo_version_tag.save, method: saveEmpty }
+            - { name: contao.callback, table: tl_settings, target: fields.memo_version_tag.wizard, method: getButtons }
         public: true
