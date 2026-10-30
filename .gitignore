@@ -6,3 +6,6 @@ Thumbs.db
 .sass-cache
 /build
 /node_module
+/.phpunit.cache
+/tests/E2E/node_modules
+/tests/E2E/bun.lock
