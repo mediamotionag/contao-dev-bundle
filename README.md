@@ -12,6 +12,8 @@ Afterwords, you can add the bundle like this:
 composer require mediamotionag/contao-dev-bundle
 ```
 
+Requires Contao 5.7 or 6.0 and PHP 8.3. For Contao 5.3–5.6 use the 3.x line (branch `release/3`).
+
 ## Usage
 1. Install Bundle
 2. Go to Contao Settings to see the options under "Entwickler Einstellungen"

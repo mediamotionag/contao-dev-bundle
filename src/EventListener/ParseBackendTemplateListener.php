@@ -10,6 +10,7 @@
 namespace Memo\DevBundle\EventListener;
 
 use Contao\Config;
+use Contao\StringUtil;
 use Contao\System;
 use Memo\DevBundle\Service\DomainMatcher;
 
@@ -27,7 +28,7 @@ class ParseBackendTemplateListener
     {
         if (in_array($template, ['be_main', 'be_login'])) {
 
-            $strBackendTitle = Config::get('backend_title');
+            $strBackendTitle = StringUtil::specialchars((string) Config::get('backend_title'));
             if($strBackendTitle != ''){
                 $buffer = preg_replace('/app-title(.*?)<\/span>/', 'app-title">Contao<span class="app-subtitle">'.$strBackendTitle.'</span></span>', $buffer);
             }

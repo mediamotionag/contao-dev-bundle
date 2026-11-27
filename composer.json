@@ -27,8 +27,8 @@
         "source": "https://github.com/mediamotionag/contao-dev-bundle"
     },
     "require": {
-        "php": "^8.1",
-        "contao/core-bundle": "^5.3"
+        "php": "^8.3",
+        "contao/core-bundle": "^5.7 || ^6.0"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",
